@@ -1,0 +1,40 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: frontend
+rules:
+  - apiGroups: [""]
+    resources: ["*"]
+    verbs: ["*"]
+...
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: alice
+  namespace: default # You can change the namespace if needed
+...
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: frontend-alice-binding
+subjects:
+  - kind: ServiceAccount
+    name: alice
+    namespace: default # Ensure this matches the ServiceAccount's namespace
+roleRef:
+  kind: ClusterRole
+  name: frontend
+  apiGroup: rbac.authorization.k8s.io
+...
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alice-token
+  annotations:
+    kubernetes.io/service-account.name: alice
+type: kubernetes.io/service-account-token
+...
